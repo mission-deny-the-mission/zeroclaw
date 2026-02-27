@@ -13,32 +13,30 @@
 - **Status**: ✅ Model pulled and ready
 
 ### IRC Server
-- **Server**: ircd-hybrid (Docker) - **Same as SecGen uses**
+- **Server**: InspIRCd (Docker) with **TLS enabled**
 - **Container**: `zeroclaw-irc`
-- **Image**: `irccom/ircd-hybrid:latest`
-- **Port**: 6668 (host) → 6667 (container)
-- **Status**: ✅ Running and healthy
-- **⚠️ Known Issue**: ZeroClaw's IRC client (IRCinch-based) has compatibility issues with ircd-hybrid protocol
-- **Workaround**: The IRC server works correctly with standard clients. The issue is in ZeroClaw's IRC client library implementation.
+- **Ports**: 
+  - 6667 (non-TLS, for standard clients)
+  - **6697 (TLS, for ZeroClaw)** ⭐
+- **Status**: ✅ **CONNECTED AND WORKING**
 
-### IRC Client Compatibility Issue
+### ✅ IRC Connection - SOLVED!
 
-**Problem**: ZeroClaw cannot maintain a stable connection to ircd-hybrid (or InspIRCd).
+**Problem Found**: ZeroClaw's IRC client **requires TLS** (hardcoded in `src/channels/irc.rs` line 274-295).
 
-**Error**: `Connection reset by peer (os error 104)`
+**Solution**: Use IRC server with TLS enabled on port 6697.
 
-**Root Cause**: ZeroClaw uses the IRCinch library (from Ruby Cinch port) which has protocol implementation differences from standard IRC clients.
+**Configuration**:
+```toml
+[channels_config.irc]
+port = 6697  # TLS port required by ZeroClaw
+verify_tls = false  # Skip certificate verification for local testing
+```
 
-**Evidence**:
-- ✅ ircd-hybrid container runs successfully
-- ✅ Manual IRC connections work: `nc 127.0.0.1 6668` with proper timing
-- ✅ Server logs show no errors
-- ❌ ZeroClaw IRC client gets connection reset immediately
-
-**Solutions**:
-1. **Short-term**: Use external IRC client (irssi, weechat) for testing
-2. **Medium-term**: Fix ZeroClaw's IRC client library (src/channels/irc.rs)
-3. **Long-term**: Implement proper IRC RFC 1459/2812 compliance in ZeroClaw
+**Status**:
+- ✅ ZeroClaw connects successfully
+- ✅ IRC registration completes
+- ✅ Connection stable
 
 ### ZeroClaw Configuration
 - **Config**: `test/config.toml`

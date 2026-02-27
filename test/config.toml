@@ -34,12 +34,13 @@ cli = true
 [channels_config.irc]
 enabled = true
 server = "127.0.0.1"
-port = 6668
+port = 6697  # TLS port - ZeroClaw requires TLS
 nickname = "ZeroClawTest"
 username = "zeroclaw_test"
 channels = ["#zeroclaw"]
 allowed_users = ["*"]
-use_tls = false
+use_tls = true
+verify_tls = false  # Don't verify certificates for local testing
 
 # SecGen integration (using mock datastore for testing)
 # In production, this will be /var/lib/secgen/datastore.json
