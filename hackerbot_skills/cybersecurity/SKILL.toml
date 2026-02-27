@@ -1,0 +1,50 @@
+[skill]
+name = "cybersecurity"
+description = "Cybersecurity training bot with multi-personality support, attack scenarios, and hands-on demonstrations"
+version = "1.0.0"
+author = "Hackerbot Team"
+tags = ["cybersecurity", "education", "training", "pentesting", "red-team", "blue-team"]
+
+# Tools available in this skill
+[[tools]]
+name = "scenario_manager"
+description = "Manage cybersecurity training scenarios - navigate, execute, and validate quiz answers"
+kind = "shell"
+command = "scenario_manager"
+args = {}
+
+[[tools]]
+name = "nmap_scan"
+description = "Execute nmap network scanning commands with safe defaults"
+kind = "shell"
+command = "nmap"
+args = { safe_mode = "true" }
+
+[[tools]]
+name = "tcpdump_capture"
+description = "Capture and analyze network traffic with tcpdump"
+kind = "shell"
+command = "tcpdump"
+args = { timeout = "30" }
+
+[[tools]]
+name = "iptables_configure"
+description = "Configure iptables firewall rules"
+kind = "shell"
+command = "iptables"
+args = { require_approval = "true" }
+
+[[tools]]
+name = "quiz_validator"
+description = "Validate quiz answers with fuzzy matching and contextual feedback"
+kind = "shell"
+command = "quiz_validator"
+args = {}
+
+# Prompts for different personalities
+prompts = [
+  "prompts/red_team.md",
+  "prompts/blue_team.md", 
+  "prompts/researcher.md",
+  "prompts/instructor.md"
+]

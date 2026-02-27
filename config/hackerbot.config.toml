@@ -1,0 +1,309 @@
+# ZeroClaw Hackerbot Configuration
+# 
+# This configuration transforms ZeroClaw into a cybersecurity training bot
+# with multi-personality support, attack scenarios, and hands-on demonstrations.
+#
+# Copy this to ~/.zeroclaw/config.toml or your workspace directory
+#
+# Last updated: February 26, 2026
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Core Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+# LLM Provider (using Ollama for local, offline-capable operation)
+default_provider = "ollama"
+default_model = "gemma3:1b"
+default_temperature = 0.7
+api_url = "http://localhost:11434"
+
+# Alternative: Use OpenAI or other providers
+# default_provider = "openai"
+# default_model = "gpt-4o"
+# api_key = "sk-..."  # Or use OPENAI_API_KEY env var
+
+# Alternative: Use OpenRouter for model flexibility
+# default_provider = "openrouter"
+# default_model = "anthropic/claude-sonnet-4-6"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Agent Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[agent]
+max_tool_iterations = 15        # Allow complex multi-turn interactions
+max_history_messages = 100      # Retain conversation context
+parallel_tools = true           # Execute independent tools concurrently
+compact_context = false         # Use full context for better understanding
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Autonomy & Security Policy
+# ─────────────────────────────────────────────────────────────────────────────
+
+[autonomy]
+level = "supervised"            # Manual approval for medium/high-risk commands
+workspace_dir = "/home/user/hackerbot_workspace"
+
+[security]
+# Shell command security
+shell_allowlist = [
+    "nmap", "tcpdump", "iptables", "ssh", "openssl", "gpg",
+    "netcat", "wireshark", "tshark", "strace", "lsof", "ss",
+    "dig", "nslookup", "whois", "curl", "wget", "ping",
+    "traceroute", "mtr", "arp", "ip", "ifconfig", "route"
+]
+
+shell_denylist = [
+    "rm -rf /", "mkfs", "dd if=/dev/zero",
+    ":(){:|:&};:", "chmod -R 777 /", "chown -R"
+]
+
+# Require explicit approval for these high-risk operations
+require_approval_for = [
+    "network_scan",      # nmap scans of external targets
+    "firewall_change",   # iptables modifications
+    "credential_access", # Accessing password files or credential stores
+    "privilege_escalation" # sudo or setuid operations
+]
+
+# Rate limiting (prevent abuse)
+rate_limit_actions_per_hour = 100
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IRC Channel Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[channels_config.irc]
+server = "localhost"
+port = 6667
+nickname = "Hackerbot"
+username = "hackerbot"
+realname = "Cybersecurity Training Bot"
+channels = ["#hackerbot", "#redteam", "#blueteam"]
+allowed_users = ["*"]           # Allow all users (restrict in production!)
+use_tls = false
+server_password = ""            # Optional IRC server password
+nickserv_password = ""          # Optional NickServ password
+sasl_password = ""              # Optional SASL authentication
+
+# Production example with TLS and authentication:
+# [channels_config.irc]
+# server = "irc.libera.chat"
+# port = 6697
+# use_tls = true
+# allowed_users = ["student1", "student2", "instructor"]
+# nickserv_password = "your_password"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Memory & RAG Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[memory]
+backend = "sqlite"
+embeddings_model = "nomic-embed-text"  # Ollama embedding model
+
+[memory.rag]
+enabled = true
+collection_name = "cybersecurity"
+max_results = 7
+similarity_threshold = 0.3  # Lower threshold for better recall
+
+# Knowledge sources for RAG
+[memory.rag.sources]
+mitre_attack = true         # MITRE ATT&CK framework
+man_pages = true            # Security tool man pages
+custom_docs = true          # Custom markdown documentation
+
+# Custom documentation paths
+[memory.rag.custom_paths]
+docs = [
+    "~/.zeroclaw/workspace/skills/cybersecurity/docs/*.md",
+    "~/hackerbot_docs/*.md"
+]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Skills Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[skills]
+open_skills_enabled = false           # Don't load community skills by default
+prompt_injection_mode = "full"        # Full prompt injection for best results
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Delegate Agents (Multi-Personality System)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Red Team Specialist - Offensive security expert
+[agents.red_team]
+provider = "ollama"
+model = "gemma3:1b"
+system_prompt = """
+You are an offensive security expert and red team specialist. You have deep 
+knowledge of penetration testing techniques, vulnerability exploitation, attack 
+methodologies, and adversarial tactics. Your goal is to help users understand 
+attack techniques from an attacker's perspective for defensive purposes.
+
+Be detailed about attack vectors, exploitation methods, and real-world attack 
+scenarios. Always emphasize ethical and legal considerations.
+
+Reference MITRE ATT&CK techniques when relevant. Provide command examples with 
+explanations. Discuss both attack execution and detection opportunities.
+"""
+agentic = true                        # Enable multi-turn tool calling
+allowed_tools = ["shell", "scenario_manager", "memory_recall", "web_search"]
+max_iterations = 10
+temperature = 0.7
+
+# Blue Team Defender - Defensive security expert
+[agents.blue_team]
+provider = "ollama"
+model = "gemma3:1b"
+system_prompt = """
+You are a defensive security expert and blue team defender. You specialize in 
+threat detection, incident response, security monitoring, and defensive strategies.
+
+Your focus is on protecting systems, detecting attacks, responding to incidents, 
+and implementing robust security controls. Provide detailed explanations about 
+defensive techniques, security tools, and best practices.
+
+Reference MITRE ATT&CK mitigations. Explain detection rules and response procedures.
+Discuss security architecture and defense-in-depth strategies.
+"""
+agentic = true
+allowed_tools = ["shell", "scenario_manager", "memory_recall", "web_search"]
+max_iterations = 10
+temperature = 0.7
+
+# Security Researcher - Academic and practical research focus
+[agents.researcher]
+provider = "ollama"
+model = "gemma3:1b"
+system_prompt = """
+You are a security researcher focused on academic and practical aspects of 
+cybersecurity. You analyze vulnerabilities, study malware behavior, conduct 
+threat intelligence research, and explore cutting-edge security topics.
+
+Your approach is analytical, evidence-based, and focused on understanding the 
+underlying mechanisms of security threats and defenses. Provide detailed 
+technical explanations with references to research papers and documentation.
+
+Cite sources when possible. Discuss both theoretical and practical implications.
+Encourage critical thinking and further investigation.
+"""
+agentic = true
+allowed_tools = ["web_search", "memory_recall", "file_read", "pdf_read"]
+max_iterations = 10
+temperature = 0.8
+
+# Cybersecurity Instructor - Professional trainer
+[agents.instructor]
+provider = "ollama"
+model = "gemma3:1b"
+system_prompt = """
+You are a professional cybersecurity instructor and trainer. Your focus is on 
+teaching cybersecurity concepts, preparing students for certifications, and 
+developing practical skills.
+
+You explain complex topics in an accessible way, provide structured learning 
+paths, and offer guidance for career development. Use analogies, examples, 
+and structured explanations to make learning effective and engaging.
+
+Check understanding with questions. Provide encouragement and constructive 
+feedback. Reference certification objectives (Security+, CISSP, OSCP) when 
+relevant.
+"""
+agentic = true
+allowed_tools = ["scenario_manager", "memory_recall", "schedule"]
+max_iterations = 10
+temperature = 0.6
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Default Personality
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Set the default personality for new conversations
+# Options: red_team, blue_team, researcher, instructor
+[hackerbot]
+default_personality = "red_team"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Observability & Logging
+# ─────────────────────────────────────────────────────────────────────────────
+
+[observability]
+backend = "log"                     # Options: none, log, prometheus, otel
+
+# Prometheus metrics (optional)
+# backend = "prometheus"
+# port = 9090
+
+# OpenTelemetry (optional)
+# backend = "otel"
+# otel_endpoint = "http://localhost:4318"
+# otel_service_name = "hackerbot"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scheduler (Optional - for automated tasks)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[scheduler]
+enabled = false
+
+# Example: Daily progress report at 5 PM
+# [[scheduler.jobs]]
+# name = "daily_progress"
+# cron = "0 17 * * *"
+# command = "zeroclaw memory recall --query 'student progress' --limit 10"
+
+# Example: Weekly knowledge base update
+# [[scheduler.jobs]]
+# name = "weekly_kb_update"
+# cron = "0 2 * * 0"
+# command = "zeroclaw skills sync"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Runtime Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[runtime]
+# Reasoning mode for supported models (optional)
+# reasoning_enabled = false
+
+# Sandbox configuration
+# kind = "native"           # Options: native, docker
+# docker_image = "zeroclaw:hackerbot"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment Variables (Reference)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Set these in your shell or .env file, NOT in config.toml:
+#
+# OLLAMA_HOST=localhost:11434
+# OPENAI_API_KEY=sk-...
+# ZEROCLAW_WORKSPACE=/path/to/workspace
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Usage Examples
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Start the bot:
+#   zeroclaw channel start
+#
+# Connect with IRC client:
+#   irc localhost 6667
+#   /join #hackerbot
+#
+# IRC Commands:
+#   hello              - Start conversation
+#   list               - List scenarios
+#   goto 1             - Jump to scenario 1
+#   next               - Next scenario
+#   previous           - Previous scenario
+#   ready              - Execute demonstration
+#   answer <text>      - Submit quiz answer
+#   personalities      - List personalities
+#   switch red_team    - Change personality
+#   help               - Show help
+#
+# ─────────────────────────────────────────────────────────────────────────────
