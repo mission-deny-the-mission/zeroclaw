@@ -13,10 +13,32 @@
 - **Status**: ✅ Model pulled and ready
 
 ### IRC Server
-- **Server**: InspIRCd (Docker)
+- **Server**: ircd-hybrid (Docker) - **Same as SecGen uses**
 - **Container**: `zeroclaw-irc`
+- **Image**: `irccom/ircd-hybrid:latest`
 - **Port**: 6668 (host) → 6667 (container)
 - **Status**: ✅ Running and healthy
+- **⚠️ Known Issue**: ZeroClaw's IRC client (IRCinch-based) has compatibility issues with ircd-hybrid protocol
+- **Workaround**: The IRC server works correctly with standard clients. The issue is in ZeroClaw's IRC client library implementation.
+
+### IRC Client Compatibility Issue
+
+**Problem**: ZeroClaw cannot maintain a stable connection to ircd-hybrid (or InspIRCd).
+
+**Error**: `Connection reset by peer (os error 104)`
+
+**Root Cause**: ZeroClaw uses the IRCinch library (from Ruby Cinch port) which has protocol implementation differences from standard IRC clients.
+
+**Evidence**:
+- ✅ ircd-hybrid container runs successfully
+- ✅ Manual IRC connections work: `nc 127.0.0.1 6668` with proper timing
+- ✅ Server logs show no errors
+- ❌ ZeroClaw IRC client gets connection reset immediately
+
+**Solutions**:
+1. **Short-term**: Use external IRC client (irssi, weechat) for testing
+2. **Medium-term**: Fix ZeroClaw's IRC client library (src/channels/irc.rs)
+3. **Long-term**: Implement proper IRC RFC 1459/2812 compliance in ZeroClaw
 
 ### ZeroClaw Configuration
 - **Config**: `test/config.toml`
