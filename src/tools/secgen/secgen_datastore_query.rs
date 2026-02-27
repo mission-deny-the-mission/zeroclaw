@@ -28,7 +28,7 @@
 //! secgen_datastore_query --key accounts --index 0 --field username
 //! ```
 
-use super::traits::{Tool, ToolResult};
+use crate::tools::traits::{Tool, ToolResult};
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};

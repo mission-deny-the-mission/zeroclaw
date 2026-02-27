@@ -1,0 +1,109 @@
+# ZeroClaw Standalone Test Configuration
+# For independent testing without SecGen VM
+
+[hackerbot]
+scenario_id = "test_standalone"
+irc_server = "127.0.0.1"
+irc_port = 6668
+default_personality = "red_team"
+
+# SecGen integration (using mock datastore)
+[secgen]
+enabled = true
+datastore_path = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/mock_datastore.json"
+
+# Agent configuration
+[agent]
+max_tool_iterations = 15
+max_history_messages = 100
+parallel_tools = true
+
+# Ollama configuration (adjust if running on different host)
+[ollama]
+host = "localhost"
+port = 11434
+model = "gemma3:1b"
+
+# Default provider
+default_provider = "ollama"
+default_model = "gemma3:1b"
+default_temperature = 0.7
+
+# Memory configuration
+[memory]
+backend = "sqlite"
+db_path = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/test_memory.db"
+
+[memory.rag]
+enabled = false  # Disable for faster testing
+
+# Security configuration (relaxed for testing)
+[security]
+workspace_dir = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/workspace"
+shell_allowlist = ["nmap", "tcpdump", "iptables", "ssh", "sshpass", "netcat", "curl", "wget", "ping", "dig", "nslookup", "whois", "traceroute", "mtr", "arp", "ip", "ifconfig", "route", "ss", "lsof", "strace", "find", "grep", "cat", "less", "head", "tail", "wc", "sort", "uniq", "awk", "sed", "cut", "tr", "base64", "openssl", "gpg", "echo", "ls", "pwd", "cd", "mkdir", "cp", "mv", "rm", "touch", "chmod", "chown", "ps", "top", "htop", "kill", "pkill", "killall", "systemctl", "journalctl", "id", "whoami", "uname", "hostname", "env", "printenv"]
+shell_denylist = ["rm -rf /", "mkfs", "dd if=/dev/zero", ":(){:|:&};:", "chmod -R 777 /", "chown -R"]
+require_approval_for = []  # Disable approval for testing
+rate_limit_actions_per_hour = 1000  # High limit for testing
+
+[autonomy]
+level = "autonomous"  # More permissive for testing
+
+# Observability
+[observability]
+backend = "log"
+log_path = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/zeroclaw_test.log"
+log_level = "debug"
+
+# Test scenarios
+[[scenarios]]
+index = 0
+title = "Initial Reconnaissance"
+prompt = "Begin by gathering information about the target system. What services are running? What ports are open? Use nmap to scan the target and identify potential entry points."
+flag_id = "flag_1"
+hint = "Try using nmap with the -sS flag for a stealthy SYN scan..."
+difficulty = "easy"
+
+[[scenarios]]
+index = 1
+title = "Service Enumeration"
+prompt = "Now that you've identified open ports, enumerate the services running on the target. What versions are they running? Are there any known vulnerabilities?"
+flag_id = "flag_2"
+hint = "Use nmap with -sV to detect service versions..."
+difficulty = "easy"
+
+[[scenarios]]
+index = 2
+title = "Initial Access"
+prompt = "Gain initial access to the system using the credentials you've discovered or vulnerabilities you've identified."
+flag_id = "flag_3"
+hint = "Check for weak credentials or misconfigured services..."
+difficulty = "medium"
+
+# Personality configurations
+[agents.red_team]
+provider = "ollama"
+model = "gemma3:1b"
+agentic = true
+allowed_tools = ["shell", "secgen_datastore_query", "secgen_flag_validator"]
+temperature = 0.7
+
+[agents.blue_team]
+provider = "ollama"
+model = "gemma3:1b"
+agentic = true
+allowed_tools = ["shell", "secgen_datastore_query", "secgen_flag_validator"]
+temperature = 0.7
+
+[agents.researcher]
+provider = "ollama"
+model = "gemma3:1b"
+agentic = true
+allowed_tools = ["shell", "secgen_datastore_query", "web_search"]
+temperature = 0.8
+
+[agents.instructor]
+provider = "ollama"
+model = "gemma3:1b"
+agentic = true
+allowed_tools = ["secgen_datastore_query"]
+temperature = 0.6

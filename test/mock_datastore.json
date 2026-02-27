@@ -1,0 +1,33 @@
+{
+  "IP_addresses": ["172.16.0.2", "172.16.0.3", "172.16.0.4"],
+  "accounts": [
+    {
+      "username": "student1",
+      "password": "testpass123",
+      "super_user": false
+    },
+    {
+      "username": "admin",
+      "password": "adminpass789",
+      "super_user": true
+    }
+  ],
+  "flags": [
+    "SEC GEN{mock_flag_recon_001}",
+    "SEC GEN{mock_flag_enum_002}",
+    "SEC GEN{mock_flag_access_003}",
+    "SEC GEN{mock_flag_user_004}",
+    "SEC GEN{mock_flag_root_005}",
+    "SEC GEN{mock_flag_lateral_006}",
+    "SEC GEN{mock_flag_exfil_007}",
+    "SEC GEN{mock_flag_persist_008}",
+    "SEC GEN{mock_flag_cover_009}",
+    "SEC GEN{mock_flag_complete_010}"
+  ],
+  "spoiler_admin_pass": "adminpass789",
+  "main_username": "student1",
+  "main_password": "testpass123",
+  "hackerbot_server_ip": "172.16.0.4",
+  "desktop_ip": "172.16.0.2",
+  "backup_server_ip": "172.16.0.3"
+}

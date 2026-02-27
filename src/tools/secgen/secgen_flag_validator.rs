@@ -36,7 +36,7 @@
 //! }
 //! ```
 
-use super::traits::{Tool, ToolResult};
+use crate::tools::traits::{Tool, ToolResult};
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -198,24 +198,25 @@ impl SecGenFlagValidatorTool {
                     .and_then(|v| v.as_str())
                     .unwrap_or(&format!("flag_{}", index + 1))
                     .to_string();
-                
+
                 let value = obj
                     .get("value")
                     .and_then(|v| v.as_str())
                     .unwrap_or("")
                     .to_string();
-                
+
                 let p = obj
                     .get("points")
                     .and_then(|v| v.as_u64())
                     .unwrap_or(100) as u32;
 
                 if value == validation.flag {
+                    let flag_id_str = id.clone();
                     flag_id = Some(id);
                     points = p;
                     return Ok(FlagValidationResult {
                         valid: true,
-                        flag_id: Some(id),
+                        flag_id: Some(flag_id_str),
                         points: p,
                         message: format!("Flag validated successfully! +{} points", p),
                         already_submitted: false,
@@ -249,7 +250,7 @@ impl SecGenFlagValidatorTool {
             progress.entries.iter().any(|entry| {
                 entry.username == *username
                     && entry.scenario_id == validation.scenario_id
-                    && entry.flag_id == flag_id.as_ref().unwrap_or(&String::new())
+                    && entry.flag_id == *flag_id.as_ref().unwrap_or(&String::new())
             })
         } else {
             false
