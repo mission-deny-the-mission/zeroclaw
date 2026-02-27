@@ -43,6 +43,7 @@ pub mod pushover;
 pub mod schedule;
 pub mod schema;
 pub mod screenshot;
+pub mod secgen;
 pub mod shell;
 pub mod traits;
 pub mod web_search_tool;
@@ -79,6 +80,8 @@ pub use schedule::ScheduleTool;
 #[allow(unused_imports)]
 pub use schema::{CleaningStrategy, SchemaCleanr};
 pub use screenshot::ScreenshotTool;
+pub use secgen::secgen_datastore_query::SecGenDatastoreQueryTool;
+pub use secgen::secgen_flag_validator::SecGenFlagValidatorTool;
 pub use shell::ShellTool;
 pub use traits::Tool;
 #[allow(unused_imports)]
