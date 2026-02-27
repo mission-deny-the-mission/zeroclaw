@@ -18,6 +18,23 @@ Replace the Ruby-based Hackerbot in SecGen with a modern, Rust-based ZeroClaw im
 - Enhanced security (sandboxing, audit logging)
 - Better performance (<5MB RAM, <0.1s startup)
 - Multi-channel support (IRC, Telegram, Discord, etc.)
+- **Flexible model deployment** (Ollama, vLLM, SGLang, llama.cpp, KTransformers)
+- **Network isolation** (dedicated proxy for model access)
+
+### Architecture Decision
+
+**Local Testing**:
+- Model: Qwen3-VL-8B via Ollama
+- Network: Localhost
+- Purpose: Development and validation
+
+**Production Deployment**:
+- Model Runner: vLLM, SGLang, llama.cpp, or KTransformers (flexible)
+- Models: Larger models with tool calling capabilities
+- Network: Separate model host, accessed via dedicated proxy
+- Isolation: Hackerbot VMs isolated from other systems
+
+See [`PRODUCTION_DEPLOYMENT_GUIDE.md`](PRODUCTION_DEPLOYMENT_GUIDE.md) for detailed deployment options.
 
 ### Current Status
 

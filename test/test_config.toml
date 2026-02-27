@@ -1,16 +1,25 @@
 # ZeroClaw Standalone Test Configuration
 # For independent testing without SecGen VM
+#
+# Local Testing Configuration:
+# - Model: Qwen3-VL-8B (via Ollama)
+# - IRC: Local test server on port 6668
+#
+# Production Deployment:
+# - Model runner: llama.cpp, sglang, vllm, ktransformers, etc.
+# - Architecture: Separate model host, accessed via dedicated proxy
+# - Isolation: Hackerbot VMs isolated from other systems
 
-[hackerbot]
-scenario_id = "test_standalone"
-irc_server = "127.0.0.1"
-irc_port = 6668
-default_personality = "red_team"
+# Core settings
+default_provider = "ollama"
+default_model = "qwen3-vl:8b"
+default_temperature = 0.7
 
-# SecGen integration (using mock datastore)
-[secgen]
-enabled = true
-datastore_path = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/mock_datastore.json"
+# Ollama configuration (local testing)
+# For production, this will point to your model proxy
+[ollama]
+host = "localhost"
+port = 11434
 
 # Agent configuration
 [agent]
@@ -18,16 +27,24 @@ max_tool_iterations = 15
 max_history_messages = 100
 parallel_tools = true
 
-# Ollama configuration (adjust if running on different host)
-[ollama]
-host = "localhost"
-port = 11434
-model = "gemma3:1b"
+# Channels configuration
+[channels_config]
+irc = true
 
-# Default provider
-default_provider = "ollama"
-default_model = "gemma3:1b"
-default_temperature = 0.7
+[channels_config.irc]
+server = "127.0.0.1"
+port = 6668
+nickname = "ZeroClawTest"
+username = "zeroclaw_test"
+channels = ["#zeroclaw"]
+allowed_users = ["*"]
+use_tls = false
+
+# SecGen integration (using mock datastore for testing)
+# In production, this will be /var/lib/secgen/datastore.json
+[secgen]
+enabled = true
+datastore_path = "/home/harry/new_hackerbot_zeroclaw/zeroclaw/test/mock_datastore.json"
 
 # Memory configuration
 [memory]
