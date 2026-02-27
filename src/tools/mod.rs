@@ -41,6 +41,7 @@ pub mod pdf_read;
 pub mod proxy_config;
 pub mod pushover;
 pub mod schedule;
+pub mod scenario_manager;
 pub mod schema;
 pub mod screenshot;
 pub mod secgen;
@@ -77,6 +78,7 @@ pub use pdf_read::PdfReadTool;
 pub use proxy_config::ProxyConfigTool;
 pub use pushover::PushoverTool;
 pub use schedule::ScheduleTool;
+pub use scenario_manager::ScenarioManagerTool;
 #[allow(unused_imports)]
 pub use schema::{CleaningStrategy, SchemaCleanr};
 pub use screenshot::ScreenshotTool;
@@ -200,6 +202,7 @@ pub fn all_tools_with_runtime(
         Arc::new(FileReadTool::new(security.clone())),
         Arc::new(FileWriteTool::new(security.clone())),
         Arc::new(GlobSearchTool::new(security.clone())),
+        Arc::new(ScenarioManagerTool::new(None)),
         Arc::new(CronAddTool::new(config.clone(), security.clone())),
         Arc::new(CronListTool::new(config.clone())),
         Arc::new(CronRemoveTool::new(config.clone(), security.clone())),

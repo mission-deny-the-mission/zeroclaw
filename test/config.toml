@@ -101,26 +101,26 @@ difficulty = "medium"
 provider = "ollama"
 model = "gemma3:1b"
 agentic = true
-allowed_tools = ["shell", "secgen_datastore_query", "secgen_flag_validator"]
+allowed_tools = ["shell", "scenario_manager", "secgen_datastore_query", "secgen_flag_validator"]
 temperature = 0.7
 
 [agents.blue_team]
 provider = "ollama"
 model = "gemma3:1b"
 agentic = true
-allowed_tools = ["shell", "secgen_datastore_query", "secgen_flag_validator"]
+allowed_tools = ["shell", "scenario_manager", "secgen_datastore_query", "secgen_flag_validator"]
 temperature = 0.7
 
 [agents.researcher]
 provider = "ollama"
 model = "gemma3:1b"
 agentic = true
-allowed_tools = ["shell", "secgen_datastore_query", "web_search"]
+allowed_tools = ["shell", "scenario_manager", "secgen_datastore_query", "web_search"]
 temperature = 0.8
 
 [agents.instructor]
 provider = "ollama"
 model = "gemma3:1b"
 agentic = true
-allowed_tools = ["secgen_datastore_query"]
+allowed_tools = ["scenario_manager", "secgen_datastore_query"]
 temperature = 0.6
